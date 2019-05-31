@@ -5,8 +5,9 @@ import sys
 import sqlite3
 
 client_config=\
-'''[server type]
+'''[general]
 type=client
+pidfile=banana.pid
 
 # 客户端默认配置
 [client]
@@ -20,8 +21,9 @@ server_port=5000
 second=1'''
 
 server_config=\
-'''[server type]
+'''[general]
 type=server
+pidfile=banana.pid
 
 # 服务端默认配置
 [service]
