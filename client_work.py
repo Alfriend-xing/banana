@@ -49,11 +49,13 @@ class ClientWorker(object):
                 d_used=d_used+tmp.used
         d=round(d_used/d_total*100,2)
         return {
+            'id':self.id,
             'ip':self.ip,
             'platform':self.sys,
             'cpu':c,
             'mem':{'percent':m.percent,'used':int(m.used/1024**2),'total':int(m.total/1024**2)},
-            'disk':{'percent':d,'used':int(d_used/1024**2),'total':int(d_total/1024**2)}
+            'disk':{'percent':d,'used':int(d_used/1024**2),'total':int(d_total/1024**2)},
+            'updatetime':time.time()
         }
 
     def send(self):
@@ -71,7 +73,7 @@ class ClientWorker(object):
 
 
 if __name__=='__main__':
-    # work=ClientWorker()
-    # work.send()
-    for k,v in psutil.net_io_counters(pernic=1, nowrap=True).items():
-        print(k,v)
+    work=ClientWorker()
+    work.send()
+
+    

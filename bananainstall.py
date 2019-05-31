@@ -42,20 +42,21 @@ def server_install():
     c = conn.cursor()
     c.execute('''CREATE TABLE realtime
              (Id TEXT primary key, 
-             Sysinfo TEXT, 
-             Ip TEXT, 
-             UpdateTime TEXT, 
-             mem TEXT,
+             platform TEXT, 
+             ip TEXT, 
+             updatetime TEXT, 
              cpu REAL, 
-             net TEXT, 
+             mem TEXT,
+             disk TEXT, 
              label TEXT, 
              message TEXT)''')
 
-    c.execute('''CREATE TABLE history
-             (UpdateTime TEXT primary key, 
-             mem TEXT, 
-             cpu REAL, 
-             net TEXT)''')
+    # 每台主机一张表，在服务端进程中创建
+    # c.execute('''CREATE TABLE history_1559291038549
+    #          (UpdateTime TEXT primary key, 
+    #          cpu REAL, 
+    #          mem TEXT, 
+    #          disk TEXT)''')
 
     conn.commit()
     conn.close()
@@ -73,6 +74,8 @@ if __name__=='__main__':
         print('[option error]\n client \n server ')
 
 
-
+# todo
+# 如何生成系统服务文件，开机自启
+# 如何生成系统服务 无需python启动
 
 
