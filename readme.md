@@ -60,6 +60,7 @@ Monitor server running state
 
 
 ## 配置文件结构
+```shell
 [server type] client/service
 # 服务器类型 客户端/服务端
 
@@ -77,6 +78,6 @@ Monitor server running state
 # 内存CPU报警阀值
 # 数据接收端口
 # web服务端口
-
+```
 
 
