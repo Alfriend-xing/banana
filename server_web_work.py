@@ -1,19 +1,38 @@
 # coding=utf-8
 # 服务端
 
-from flask import Flask,request
+from flask import Flask,request,render_template
+import sqlite3
+import json
 
 app=Flask(__name__)
 
-# 首页 查询实时数据
-@app.route('/',methods=['get'])
+# 首页 
+@app.route('/',methods=['GET'])
 def index():
+    return render_template('index.html')
+
+
+# 查询实时数据api
+@app.route('/api',methods=['get'])
+def api():
+    res=[]
     conn = sqlite3.connect('test.db')
     c = conn.cursor()
     for row in c.execute('SELECT * FROM realtime ORDER BY id'):
-        print(row)
+        res.append({
+            'id':row[0],
+            'platform':row[1],
+            'ip':row[2],
+            'updatetime':row[3],
+            'cpu':row[4],
+            'mem':row[5],
+            'disk':row[6],
+            'label':row[7],
+            'message':row[8]
+        })
     conn.close()
-    return 'ok'
+    return json.dumps(res)
 
 # 主机详细信息
 

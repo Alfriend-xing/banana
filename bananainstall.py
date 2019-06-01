@@ -2,6 +2,7 @@
 # 生成配置文件
 import time
 import sys
+import os
 import sqlite3
 
 client_config=\
@@ -40,10 +41,12 @@ def client_install():
         f.write(client_config%id)
 
 def server_install():
+    if os.path.exists('test.db'):
+        os.remove('test.db')
     conn = sqlite3.connect('test.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE realtime
-             (Id TEXT primary key, 
+             (id TEXT primary key, 
              platform TEXT, 
              ip TEXT, 
              updatetime TEXT, 
@@ -55,7 +58,7 @@ def server_install():
 
     # 每台主机一张表，在服务端进程中创建
     # c.execute('''CREATE TABLE history_1559291038549
-    #          (UpdateTime TEXT primary key, 
+    #          (updatetime TEXT primary key, 
     #          cpu REAL, 
     #          mem TEXT, 
     #          disk TEXT)''')

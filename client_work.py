@@ -55,7 +55,7 @@ class ClientWorker(object):
             'cpu':c,
             'mem':{'percent':m.percent,'used':int(m.used/1024**2),'total':int(m.total/1024**2)},
             'disk':{'percent':d,'used':int(d_used/1024**2),'total':int(d_total/1024**2)},
-            'updatetime':time.time()
+            'updatetime':int(time.time())
         }
 
     def send(self):
