@@ -7,10 +7,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
     <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"> </script>
     <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+    <link rel="stylesheet" type="text/css" href={{url_for("static",filename="css/snackbar.css")}}>
     <title>Document</title>
 </head>
 <body>
-    <div class="ui attached stackable menu">
+    <div class="ui attached stackable menu"
+            style="margin:0 0 1.5em;" >
             <div class="ui container">
                 <a class="item">
                 <i class="home icon"></i> Home
@@ -42,9 +44,15 @@
     <div class="ui link cards" id="cards">
             <!-- <div class="card" id='ccc'>
                     <div class="content">
-                      <img class="right floated mini ui image" src={{url_for('static',filename='images/centos.png')}}>
-                      <div class="header">
+                        <div data-tooltip="centos" data-position="top right" id="platform">
+                      <img class="right floated mini ui image" 
+                      src={{url_for('static',filename='images/centos.png')}}>
+                        </div>
+                      <div class="header" id="ip">
                           192.168.2.100
+                          <a data-tooltip="online" id="state">
+                          <i class="mini green circle icon" id="state_icon"></i>
+                          </a>
                       </div>
                       <div class="meta">
                           <a class="ui teal label">dev</a>
@@ -54,80 +62,83 @@
                       </div>
                     </div>
                     <div class="extra content">
-                        <div class="content">
                             <div class="label">cpu</div>
-                            <div class="ui indicating progress" 
+                            <div class="ui teal progress" 
+                            style="margin:0 0 0 0;" 
                             data-tooltip="100/500GB" 
                             data-position="top left" 
-                            data-percent="74">
-                            <div class="bar" style="width:74%;"></div>
+                            data-percent="30" 
+                            id="p1">
+                            <div class="bar"></div>
                             </div>
-                        </div>
-                        <div class="content">
                             <div class="label">mem</div>
-                            <div class="ui indicating progress" 
+                            <div class="ui progress" 
+                            style="margin:0 0 0 0;" 
                             data-tooltip="3.8/4GB" 
                             data-position="top left" 
-                            data-percent="74">
-                            <div class="bar" style="width:74%;"></div>
+                            data-percent="30"
+                            id="p2">
+                            <div class="bar"></div>
                             </div>
-                        </div>
                     </div>
-                  </div>
-        <div class="card">
-          <div class="content">
-            <img class="right floated mini ui image" src={{url_for('static',filename='images/centos.png')}}>
-            <div class="header">
-                192.168.2.101
-            </div>
-            <div class="meta">
-                <a class="ui teal label">test</a>
-            </div>
-            <div class="description">
-                a place to test
-            </div>
-          </div>
-          <div class="extra content">
-              <div class="content">
-                  <div class="label">cpu</div>
-                  <div class="ui indicating progress" 
-                  data-tooltip="100/500GB" 
-                  data-position="top left" 
-                  data-percent="74">
-                  <div class="bar" style="width:74%;"></div>
-                  </div>
-                </div>
-                <div class="content">
-                  <div class="label">mem</div>
-                  <div class="ui indicating progress" 
-                  data-tooltip="3.8/4GB" 
-                  data-position="top left" 
-                  data-percent="74">
-                  <div class="bar" style="width:74%;"></div>
-                  </div>
-              </div>
-          </div>
-        </div> -->
+            </div> -->
     </div>
+
     <script>
     $(function(){
 // 开始写 jQuery 代码...
 function update_form(jsondata){
     console.log('update_form')
+    var timestampms=new Date().getTime()
+    var timestamp=Math.ceil(timestampms/1000)
     for (data in jsondata) {
+        var id=jsondata[data]['id']
+        var platform=jsondata[data]['platform']
+        var ip=jsondata[data]['ip']
+        var cpu=jsondata[data]['cpu']
+        var mem=JSON.parse(jsondata[data]["mem"])
+        var updatetime=jsondata[data]['updatetime']
+        var card=$('#'+id)
         console.log(jsondata[data])
-        if ($('#'+jsondata[data]['id']).length > 0) {
-            var b = $('#'+jsondata[data]['id']).find(".bar")
-            b.first().attr("style","width:"+jsondata[data]["cpu"]+"%")
-            b.last().attr("style","width:"+JSON.parse(jsondata[data]["mem"])["percent"]+"%")
+        if (card.length > 0) {
+            console.log('timestamp'+timestamp)
+            console.log('updatetime'+updatetime)
+            if (timestamp-updatetime>5) {
+                if (card.find("#state_icon").attr("class")!="mini grey circle icon") {
+                    myFunction(ip+"下线")
+                    card.find("#state_icon").attr("class","mini grey circle icon")
+                }
+                else {
+
+                }
+            }
+            else {
+                if (card.find("#state_icon").attr("class")!="mini green circle icon") {
+                    myFunction(ip+"上线")
+                    card.find("#state_icon").attr("class","mini green circle icon")
+                }
+                else {
+                    
+                }
+                
+            }
+            var b = card.find(".bar")
+            b.first().attr("style","transition-duration: 2000ms; width:"+jsondata[data]["cpu"]+"%")
+            b.last().attr("style","transition-duration: 2000ms; width:"+JSON.parse(jsondata[data]["mem"])["percent"]+"%")
         }
         else {
             console.log('add card')
-            var t='<div class="card" id="'+jsondata[data]['id']+'">\
+            var t='<div class="card" id="'+id+'">\
                     <div class="content">\
-                      <img class="right floated mini ui image" src={{url_for("static",filename="images/centos.png")}}>\
-                      <div class="header">\
-                          192.168.2.100\
+                        <div data-tooltip="'+platform+'" data-position="top right" id="platform">\
+                      <img class="right floated mini ui image" \
+                      src={{url_for("static",filename="images/centos.png")}}>\
+                        </div>\
+                      <div class="header" id="ip">\
+                          '+ip+'\
+                          <a data-tooltip="online" id="state">\
+                          <i class="mini green circle icon" id="state_icon"></i>\
+                          </a>\
                       </div>\
                       <div class="meta">\
                           <a class="ui teal label">dev</a>\
@@ -137,26 +148,25 @@ function update_form(jsondata){
                       </div>\
                     </div>\
                     <div class="extra content">\
-                        <div class="content">\
                             <div class="label">cpu</div>\
-                            <div class="ui indicating progress" \
-                            data-tooltip="100/500GB" \
+                            <div class="ui teal progress" \
+                            style="margin:0 0 0 0;" \
                             data-position="top left" \
-                            data-percent="74">\
-                            <div class="bar" style="width:74%;"></div>\
+                            id="p1">\
+                            <div class="bar" \
+                            style="transition-duration: 2000ms; width: '+cpu+'%;"></div>\
                             </div>\
-                        </div>\
-                        <div class="content">\
                             <div class="label">mem</div>\
-                            <div class="ui indicating progress" \
-                            data-tooltip="3.8/4GB" \
-                            data-position="top left" \
-                            data-percent="74">\
-                            <div class="bar" style="width:74%;"></div>\
+                            <div class="ui progress" \
+                            style="margin:0 0 0 0;" \
+                            data-tooltip="'+mem["used"]+'/'+mem["total"]+'" \
+                            data-position="bottom left" \
+                            id="p2">\
+                            <div class="bar"  \
+                            style="transition-duration: 2000ms; width: '+mem["percent"]+'%;"></div>\
                             </div>\
-                        </div>\
                     </div>\
-                  </div>'
+            </div>'
             $("#cards").append(t)
         }
     }
@@ -170,7 +180,26 @@ function refun() {
     // 'mem':Math.ceil(Math.random()*100)}]);
 }
 window.setInterval( refun, 1000);
+// $("#ccc").find('#p1').progress();
+// $("#ccc").find('#p2').progress();
+$("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 3000ms; width: 37%;");
 });
+    </script>
+    <button onclick="myFunction(new Date().getTime())">Show Snackbar</button>
+
+    <div id="snackbars">Some text some message..</div>
+    
+    <script>
+    function myFunction(msg) {
+      var x = $("#snackbars");
+      var sb = $("<div></div>")
+      sb.attr({"id":"snackbar",
+                "class":"show"})
+    sb.text(msg)
+    x.append(sb)
+    //   x.className = "show";
+      setTimeout(function(){ sb.remove(); }, 3000);
+    }
     </script>
 </body>
 </html>
