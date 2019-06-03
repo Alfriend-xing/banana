@@ -15,9 +15,12 @@
             style="margin:0 0 1.5em;" >
             <div class="ui container">
                 <a class="item">
-                <i class="home icon"></i> Home
+                <img src={{url_for("static",filename="images/banana.jpg")}}> Banana
                 </a>
-                <a class="item">
+                <a class="item" href="https://github.com/Alfriend-xing/banana">
+                <i class="github icon"></i> Home
+                </a>
+                <!-- <a class="item">
                 <i class="grid layout icon"></i> Browse
                 </a>
                 <a class="item">
@@ -31,14 +34,7 @@
                     <a class="item"><i class="globe icon"></i> Choose Language</a>
                     <a class="item"><i class="settings icon"></i> Account Settings</a>
                 </div>
-                </div>
-                <div class="right item">
-                <div class="ui input"><input type="text" placeholder="Search..."></div>
-                </div>
-                <div class="ui toggle checkbox">
-                    <input type="checkbox" tabindex="0" class="hidden">
-                    <label>只显示在线主机</label>
-                </div>
+                </div> -->
             </div>
             </div>
     <div class="ui link cards" id="cards">
@@ -88,7 +84,7 @@
     $(function(){
 // 开始写 jQuery 代码...
 function update_form(jsondata){
-    console.log('update_form')
+    // console.log('update_form')
     var timestampms=new Date().getTime()
     var timestamp=Math.ceil(timestampms/1000)
     for (data in jsondata) {
@@ -99,14 +95,19 @@ function update_form(jsondata){
         var mem=JSON.parse(jsondata[data]["mem"])
         var updatetime=jsondata[data]['updatetime']
         var card=$('#'+id)
-        console.log(jsondata[data])
+        // console.log(jsondata[data])
         if (card.length > 0) {
-            console.log('timestamp'+timestamp)
-            console.log('updatetime'+updatetime)
+            // console.log('timestamp'+timestamp)
+            // console.log('updatetime'+updatetime)
             if (timestamp-updatetime>5) {
                 if (card.find("#state_icon").attr("class")!="mini grey circle icon") {
-                    myFunction(ip+"下线")
+                    myFunction({"state":false,"msg":ip+"下线"})
                     card.find("#state_icon").attr("class","mini grey circle icon")
+                    var b = card.find(".bar")
+                    b.first().attr("style","transition-duration: 2000ms; width:0%;")
+                    b.last().attr("style","transition-duration: 2000ms; width:0%;")
+                    card.find(".label#l1").text("cpu ")
+                    card.find(".label#l2").text("mem ")
                 }
                 else {
 
@@ -114,21 +115,24 @@ function update_form(jsondata){
             }
             else {
                 if (card.find("#state_icon").attr("class")!="mini green circle icon") {
-                    myFunction(ip+"上线")
+                    myFunction({"state":true,"msg":ip+"上线"})
                     card.find("#state_icon").attr("class","mini green circle icon")
+                    
                 }
                 else {
                     
                 }
-                
+                var b = card.find(".bar")
+                b.first().attr("style","transition-duration: 2000ms; width:"+cpu+"%")
+                card.find(".label#l1").text("cpu "+cpu+"%")
+                b.last().attr("style","transition-duration: 2000ms; width:"+mem["percent"]+"%")
+                card.find(".label#l2").text("mem "+mem["percent"]+"%")
             }
-            var b = card.find(".bar")
-            b.first().attr("style","transition-duration: 2000ms; width:"+jsondata[data]["cpu"]+"%")
-            b.last().attr("style","transition-duration: 2000ms; width:"+JSON.parse(jsondata[data]["mem"])["percent"]+"%")
+            
         }
         else {
             console.log('add card')
-            var t='<div class="card" id="'+id+'">\
+            var t='<div class="card" id="'+id+'" onclick="serverinfo(\''+ip+'\')">\
                     <div class="content">\
                         <div data-tooltip="'+platform+'" data-position="top right" id="platform">\
                       <img class="right floated mini ui image" \
@@ -136,9 +140,7 @@ function update_form(jsondata){
                         </div>\
                       <div class="header" id="ip">\
                           '+ip+'\
-                          <a data-tooltip="online" id="state">\
                           <i class="mini green circle icon" id="state_icon"></i>\
-                          </a>\
                       </div>\
                       <div class="meta">\
                           <a class="ui teal label">dev</a>\
@@ -148,7 +150,7 @@ function update_form(jsondata){
                       </div>\
                     </div>\
                     <div class="extra content">\
-                            <div class="label">cpu</div>\
+                            <div class="label" id="l1">cpu</div>\
                             <div class="ui teal progress" \
                             style="margin:0 0 0 0;" \
                             data-position="top left" \
@@ -156,7 +158,7 @@ function update_form(jsondata){
                             <div class="bar" \
                             style="transition-duration: 2000ms; width: '+cpu+'%;"></div>\
                             </div>\
-                            <div class="label">mem</div>\
+                            <div class="label" id="l2">mem</div>\
                             <div class="ui progress" \
                             style="margin:0 0 0 0;" \
                             data-tooltip="'+mem["used"]+'/'+mem["total"]+'" \
@@ -175,31 +177,93 @@ function refun() {
     $.getJSON( "api", function( data ) {
         update_form(data);
         });
-    // update_form([{'id':'ccc',
-    // 'cpu':Math.ceil(Math.random()*100),
-    // 'mem':Math.ceil(Math.random()*100)}]);
 }
 window.setInterval( refun, 1000);
-// $("#ccc").find('#p1').progress();
-// $("#ccc").find('#p2').progress();
 $("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 3000ms; width: 37%;");
 });
     </script>
-    <button onclick="myFunction(new Date().getTime())">Show Snackbar</button>
+    <!-- <button onclick="myFunction(new Date().getTime())">Show Snackbar</button> -->
 
-    <div id="snackbars">Some text some message..</div>
+    <!-- <div id="snackbars">Some text some message..</div> -->
+    <div id="snackbars"></div>
     
     <script>
-    function myFunction(msg) {
+    function myFunction(data) {
+        // data {'state':true,'msg':'127.0.0.1上线'}
       var x = $("#snackbars");
       var sb = $("<div></div>")
-      sb.attr({"id":"snackbar",
-                "class":"show"})
-    sb.text(msg)
+      if (data['state']) {
+            sb.attr({"id":"snackbar",
+                        "class":"show",
+                        "style":"background-color: #00b5ad;"})
+                // background-color: #00b5ad #888;
+      }
+      else {
+        sb.attr({"id":"snackbar",
+                    "class":"show",
+                    "style":"background-color: #888;"})
+            // background-color: #00b5ad #888;
+      }
+    sb.text(data["msg"])
     x.append(sb)
     //   x.className = "show";
       setTimeout(function(){ sb.remove(); }, 3000);
     }
     </script>
+<!-- 服务器详情页 -->
+<div class="ui modal" style="max-width: 40rem;">
+        <i class="close icon"></i>
+        <div class="header">
+          127.0.0.1
+        </div>
+        <div class="ui top attached tabular menu">
+                <a class="item active" data-tab="first">CPU</a>
+                <a class="item" data-tab="second">MEM</a>
+                <a class="item" data-tab="third">DISK</a>
+                <a class="item" data-tab="fourth">OPERATION</a>
+              </div>
+              <div class="ui bottom attached tab segment active" style="min-height: 20rem;" data-tab="first">
+                CPU
+                
+              </div>
+              <div class="ui bottom attached tab segment" style="min-height: 20rem" data-tab="second">
+                MEM
+              </div>
+              <div class="ui bottom attached tab segment" style="min-height: 20rem" data-tab="third">
+                DISK
+              </div>
+              <div class="ui bottom attached tab segment" style="min-height: 20rem" data-tab="fourth">                
+                <div class="ui form">
+                    <div class="field">
+                        <label>Label</label>
+                        <input type="text" name="first-name" placeholder="a lebel of server">
+                    </div>
+                    <div class="field">
+                        <label>Server description</label>
+                        <textarea rows="2"  placeholder="server description"></textarea>
+                    </div>
+                    <div class="ui container">
+                    <button class="ui primary basic button">commit</button>
+                    <button class="ui right floated negative basic button">delete server data</button>
+                    </div>
+                </div>
+            </div></br>
+      </div>
+      <script>
+          $('.menu .item').tab()
+          $.get('api',function(data){
+            //   $("div[data-tab='first']").text(data)
+            //   $("div[data-tab='second']").text(data)
+              $("div[data-tab='third']").text(data)
+          });
+          function serverinfo(ip) {
+            $('.ui.modal').find(".header").text(ip)
+            $('.ui.modal')
+            .modal({
+                dimmerSettings: { opacity: 0 }
+                }).modal('show');
+          }
+      </script>
+      <button onclick="serverinfo('127.0.0.1')">Show serverinfo</button>
 </body>
 </html>

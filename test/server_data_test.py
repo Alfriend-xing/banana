@@ -11,11 +11,13 @@ t=0
 f=0
 
 def task(i):
-    for _ in range(60):
+    ip='192.168.1.10'+str(i)
+    # time.sleep(random.randint(1,10))
+    for _ in range(20):
         data={
                 # "id":str(int(round(time.time(),3)*1000)),
                 "id":str(i),
-                "ip":"127.0.0.1",
+                "ip":ip,
                 "platform":"win10",
                 "cpu":random.randint(1,100),
                 "mem":{"percent":random.randint(1,100),"used":90,"total":100},

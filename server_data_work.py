@@ -17,6 +17,12 @@ def receive_api():
     json_data=request.json
     # pool.submit(thread_sql,json_data)
     return thread_sql(json_data)
+    # if json_data['type']=='second':
+    #     return thread_sql(json_data)
+    # elif json_data['type']=='hour':
+    #     pass
+    # else:
+    #     return 'data error'
 
 def thread_sql(json_data):
     # lock.acquire()
