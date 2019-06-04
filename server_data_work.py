@@ -86,16 +86,16 @@ def thread_history_sql(json_data):
         t1 = (str(json_data['id']),)
         t2=(str(json_data['updatetime']),
             json_data['cpu'],
-            json.dumps(json_data['mem']),
-            json.dumps(json_data['disk']),
-            json.dumps(json_data['net']),)
+            json_data['mem'],
+            json_data['disk'],
+            json_data['net'],)
         real_res=c.execute('SELECT * FROM history WHERE id=?', t1).fetchone()
         if real_res:
             tmp=[]
-            for i in range(1,7):
+            for i in range(1,6):
                 tmp.append(str(eval(real_res[i])[1:]+[t2[i-1]]))    # so bad
 
-            sql='''UPDATE realtime SET 
+            sql='''UPDATE history SET 
                     updatetime=?,
                     cpu=?,
                     mem=?,
@@ -105,11 +105,11 @@ def thread_history_sql(json_data):
             c.execute(sql,tuple(tmp)+t1)
         else:
             sql='''INSERT INTO history VALUES (?,?,?,?,?,?)'''
-            tmp=[None]*9 # 999 测试时存10条，生产环境1000
-            c.execute(sql,t1+(str(tmp+[i]) for i in t2))
+            tmp=[0]*9 # 999 测试时存10条，生产环境1000
+            c.execute(sql,t1+tuple([str(tmp+[i]) for i in t2]))
         conn.commit()
         return 'True'
-    except Exception as e:
+    except IOError as e:
         conn.rollback()
         print(type(e))
         print(e)

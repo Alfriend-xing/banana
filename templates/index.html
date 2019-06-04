@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
     <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"> </script>
     <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
     <link rel="stylesheet" type="text/css" href={{url_for("static",filename="css/snackbar.css")}}>
     <title>Document</title>
 </head>
@@ -132,15 +133,16 @@ function update_form(jsondata){
         }
         else {
             console.log('add card')
-            var t='<div class="card" id="'+id+'" onclick="serverinfo(\''+ip+'\')">\
+            if (timestamp-updatetime<5) {
+                myFunction({"state":true,"msg":ip+"上线"})
+            }
+            var t='<div class="card" id="'+id+'" onclick="serverinfo(\''+id+'\')">\
                     <div class="content">\
                         <div data-tooltip="'+platform+'" data-position="top right" id="platform">\
                       <img class="right floated mini ui image" \
                       src={{url_for("static",filename="images/centos.png")}}>\
                         </div>\
-                      <div class="header" id="ip">\
-                          '+ip+'\
-                          <i class="mini green circle icon" id="state_icon"></i>\
+                      <div class="header" id="ip">'+ip+'<i class="mini green circle icon" id="state_icon"></i>\
                       </div>\
                       <div class="meta">\
                           <a class="ui teal label">dev</a>\
@@ -214,26 +216,27 @@ $("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 3000ms; wi
 <div class="ui modal" style="max-width: 40rem;">
         
         <i class="orange close icon" style="position: absolute; top: 1rem; right: 1rem;"></i>
-        <div class="header">
-          127.0.0.1
-        </div>
+        <div class="header">127.0.0.1</div>
         <div class="ui top attached tabular menu">
                 <a class="item active" data-tab="first">CPU</a>
                 <a class="item" data-tab="second">MEM</a>
                 <a class="item" data-tab="third">DISK</a>
-                <a class="item" data-tab="fourth">OPERATION</a>
+                <a class="item" data-tab="fourth">NET</a>
+                <a class="item" data-tab="fifth">OPERATION</a>
+        </div>
+              <div class="ui bottom attached tab segment active" style="height:20rem" data-tab="first" id="tab_CPU_chart">
+                <canvas id="CPU_chart" style="width: 100%;height: 100%;"></canvas>
               </div>
-              <div class="ui bottom attached tab segment active" style="min-height: 20rem;" data-tab="first">
-                CPU
-                
+              <div class="ui bottom attached tab segment" style="height:20rem" data-tab="second" id="tab_MEM_chart">
+                <canvas id="MEM_chart" style="width: 100%;height: 100%;"></canvas>
               </div>
-              <div class="ui bottom attached tab segment" style="min-height: 20rem" data-tab="second">
-                MEM
+              <div class="ui bottom attached tab segment" style="height:20rem" data-tab="third" id="tab_DISK_chart">
+                <canvas id="DISK_chart" style="width: 100%;height: 100%;"></canvas>
               </div>
-              <div class="ui bottom attached tab segment" style="min-height: 20rem" data-tab="third">
-                DISK
+              <div class="ui bottom attached tab segment" style="height:20rem" data-tab="fourth" id="tab_NET_chart">
+                <canvas id="NET_chart" style="width: 100%;height: 100%;"></canvas>
               </div>
-              <div class="ui bottom attached tab segment" style="min-height: 20rem" data-tab="fourth">                
+              <div class="ui bottom attached tab segment" style="height:20rem" data-tab="fifth" id="tab5">          
                 <div class="ui form">
                     <div class="field">
                         <label>Label</label>
@@ -253,10 +256,50 @@ $("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 3000ms; wi
       <script>
           $('.menu .item').tab()
           function serverinfo(id) {
-            $.get('/api/history/<'+id+'>',function(data){
-                  $("div[data-tab='first']").text(data)
-                  $("div[data-tab='second']").text(data)
-                $("div[data-tab='third']").text(data)
+            var ip=$("#"+id).find("#ip").text()
+            $.getJSON('/api/history/'+id,function(data){
+                if (data['state']) {
+                    // $("div[data-tab='first']").text(data['cpu'])
+                    // $("div[data-tab='second']").text(data['mem'])
+                    // $("div[data-tab='third']").text(data['disk'])
+                    // $("div[data-tab='fourth']").text(data['net'])
+                    var datetime= new Array()
+                    // var time_zone=new Date().getTimezoneOffset()/60
+                    for (i=0,len=data["updatetime"].length;i<len;i++) {
+                        tmp_time=new Date(Number(data["updatetime"][i])*1000)
+                        datetime[i]= tmp_time.getMonth()+'-'+tmp_time.getDate()+' '+tmp_time.getHours()+':'+tmp_time.getMinutes()
+                        console.log(datetime[i])
+                    }
+                    drawchart({"id":"CPU_chart",
+                    "type":"cpu",
+                    "x":datetime,
+                    "y":data["cpu"],
+                    "title":"过去一周CPU使用情况",
+                    "label":"CPU使用率"})
+                    drawchart({"id":"MEM_chart",
+                    "type":"mem",
+                    "x":datetime,
+                    "y":data["mem"],
+                    "title":"过去一周内存使用情况",
+                    "label":"内存使用率"})
+                    drawchart({"id":"DISK_chart",
+                    "type":"disk",
+                    "x":datetime,
+                    "y":data["disk"],
+                    "title":"过去一周硬盘使用情况",
+                    "label":"硬盘使用率"})
+                    drawchart({"id":"NET_chart",
+                    "type":"net",
+                    "x":datetime,
+                    "y":data["net"],
+                    "title":"过去一周网络使用情况",
+                    "label":""})
+                }
+                else {
+                    $("div[data-tab='first']").text('ERROR')
+                    $("div[data-tab='second']").text('ERROR')
+                    $("div[data-tab='third']").text('ERROR')
+                }
             });
             $('.ui.modal').find(".header").text(ip)
             $('.ui.modal')
@@ -265,6 +308,118 @@ $("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 3000ms; wi
                 }).modal('show');
           }
       </script>
-      <button onclick="serverinfo('127.0.0.1')">Show serverinfo</button>
+      <button onclick="serverinfo('1')">Show serverinfo</button>
+
+      <!-- 画图函数 -->
+      <script>
+      function drawchart(data) {
+          var type=data['type']
+          var elementid=data['id']
+          var x=data['x']
+          var y=data['y']
+          var title=data['title']
+          var label=data['label']
+          $("#"+elementid).remove();
+            $('#tab_'+elementid).append('<canvas id="'+elementid+'" style="width: 100%;height: 100%;"></canvas>');
+            var ctx = $("#"+elementid)[0].getContext('2d');
+            if (type=='net') {
+                var upload=new Array()
+                var dwload=new Array()
+                for(j = 0,len=y.length; j < len; j++) {
+                    console.log(y)
+                    console.log(y[j])
+                    if (y[j]==0) {
+                    upload[j]=0
+                    dwload[j]=0
+                    }
+                    else {
+                    var tmp=y[j].split('/')
+                    upload[j]=Number(tmp[0])
+                    dwload[j]=Number(tmp[1])
+                    }
+                }
+                var chart = new Chart(ctx, {
+                // The type of chart we want to create
+                type: 'line',
+
+                // The data for our dataset
+                data: {
+                    labels: x, //['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                    datasets: [{
+                        label: "上传流量", //'My First dataset',
+                        fill: false,
+                        backgroundColor: 'rgb(0,181,173)',//#00b5ad
+                        borderColor: 'rgb(0,181,173)',
+                        data: upload, //[0, 10, 5, 2, 20, 30, 45]
+                    },
+                    {
+                        label:"下载流量",
+                        fill: false,
+                        backgroundColor: 'rgb(118,118,118)', //#767676
+                        borderColor: 'rgb(118,118,118)',
+                        data: dwload, //[0, 10, 5, 2, 20, 30, 45]
+                    }]
+                },
+
+                // Configuration options go here
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: title
+                    },
+                }
+                
+                // options: {
+                //         scales: {
+                //             yAxes: [{
+                //                 ticks: {
+                //                     suggestedMin: 0,
+                //                     suggestedMax: 100
+                //                 }
+                //             }]
+                //         }
+                //     }
+            });
+            }
+            else {
+                var chart = new Chart(ctx, {
+                // The type of chart we want to create
+                type: 'line',
+
+                // The data for our dataset
+                data: {
+                    labels: x, //['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                    datasets: [{
+                        label: label, //'My First dataset',
+                        backgroundColor: 'rgba(0,181,173,0.5)',
+                        borderColor: 'rgb(0,181,173)',
+                        pointBorderWidth:5,
+                        borderWidth:1,
+                        data: y, //[0, 10, 5, 2, 20, 30, 45]
+                    }]
+                },
+
+                // Configuration options go here
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: title
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                suggestedMin: 0,
+                                suggestedMax: 100,
+                            }
+                        }]
+                    }
+                }
+            });
+            }
+            
+            }
+      </script>
 </body>
 </html>

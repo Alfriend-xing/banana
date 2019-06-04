@@ -62,8 +62,8 @@ def server_install():
              (id TEXT primary key, 
              updatetime TEXT, 
              cpu REAL, 
-             mem TEXT, 
-             disk TEXT, 
+             mem REAL, 
+             disk REAL, 
              net TEXT)''')
 
     conn.commit()

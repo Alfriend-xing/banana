@@ -44,7 +44,7 @@ def task_history(i):
                 "cpu":random.randint(1,100),
                 "mem":random.randint(1,100),
                 "disk":random.randint(1,100),
-                "net":random.randint(1,100),
+                "net":str(random.randint(1,100))+'/'+str(random.randint(1,100)),
             }
         global t,f
         res=requests.post("http://127.0.0.1:5000/api/history/",json=data)

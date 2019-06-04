@@ -41,20 +41,19 @@ def api_history(id):
     res=[]
     conn = sqlite3.connect('test.db')
     c = conn.cursor()
-    history_res = c.execute('SELECT * FROM history WHERE id=?',(id,))
+    history_res = c.execute('SELECT * FROM history WHERE id=?',(id,)).fetchone()
     if history_res:
         return json.dumps({'state':True,
                             'id':history_res[0],
-                            'updatetime':history_res[1],
-                            'cpu':history_res[2],
-                            'mem':history_res[3],
-                            'disk':history_res[4],
-                            'net':history_res[5],
+                            'updatetime':eval(history_res[1]),
+                            'cpu':eval(history_res[2]),
+                            'mem':eval(history_res[3]),
+                            'disk':eval(history_res[4]),
+                            'net':eval(history_res[5]),
                             })
     else:
         return json.dumps({'state':False})
     conn.close()
-    return json.dumps(res)
 
 
 # 删除主机
