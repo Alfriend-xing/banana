@@ -25,7 +25,7 @@ def task(i):
                 "updatetime":int(time.time())
             }
         global t,f
-        res=requests.post("http://127.0.0.1:5000/",json=data)
+        res=requests.post("http://127.0.0.1:5000/api/",json=data)
         print(res.text)
         if res.text=="True":
             t=t+1
@@ -33,9 +33,33 @@ def task(i):
             f=f+1
         time.sleep(1)
 
+def task_history(i):
+    ip='192.168.1.10'+str(i)
+    # time.sleep(random.randint(1,10))
+    for _ in range(20):
+        data={
+                # "id":str(int(round(time.time(),3)*1000)),
+                "id":str(i),
+                "updatetime":int(time.time()),
+                "cpu":random.randint(1,100),
+                "mem":random.randint(1,100),
+                "disk":random.randint(1,100),
+                "net":random.randint(1,100),
+            }
+        global t,f
+        res=requests.post("http://127.0.0.1:5000/api/history/",json=data)
+        print(res.text)
+        if res.text=="True":
+            t=t+1
+        else:
+            f=f+1
+        time.sleep(60)
+
 taskpool=[]
 for i in range(5):
-    taskpool.append(pool.submit(task,i))
+    # taskpool.append(pool.submit(task,i))
+    taskpool.append(pool.submit(task_history,i))
+    
 wait(taskpool)
 e=time.time()
 print(e-s)

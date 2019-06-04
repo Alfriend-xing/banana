@@ -45,6 +45,7 @@ def server_install():
         os.remove('test.db')
     conn = sqlite3.connect('test.db')
     c = conn.cursor()
+    # 实时状态表
     c.execute('''CREATE TABLE realtime
              (id TEXT primary key, 
              platform TEXT, 
@@ -56,12 +57,14 @@ def server_install():
              label TEXT, 
              message TEXT)''')
 
-    # 每台主机一张表，在服务端进程中创建
-    # c.execute('''CREATE TABLE history_1559291038549
-    #          (updatetime TEXT primary key, 
-    #          cpu REAL, 
-    #          mem TEXT, 
-    #          disk TEXT)''')
+    # 所有主机共享一张历史表，在服务端进程中创建
+    c.execute('''CREATE TABLE history 
+             (id TEXT primary key, 
+             updatetime TEXT, 
+             cpu REAL, 
+             mem TEXT, 
+             disk TEXT, 
+             net TEXT)''')
 
     conn.commit()
     conn.close()
@@ -70,7 +73,11 @@ def server_install():
 
 
 if __name__=='__main__':
-    install_type = sys.argv[1]
+    if len(sys.argv)<=1:
+        print('[option error]\n client \n server ')
+        sys.exit()
+    else:
+        install_type = sys.argv[1]
     if install_type == 'client':
         client_install()
     elif install_type == 'server':

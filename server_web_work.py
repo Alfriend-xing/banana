@@ -34,7 +34,28 @@ def api():
     conn.close()
     return json.dumps(res)
 
-# 主机详细信息
+# 查询历史API
+# 查询实时数据api
+@app.route('/api/history/<id>',methods=['get'])
+def api_history(id):
+    res=[]
+    conn = sqlite3.connect('test.db')
+    c = conn.cursor()
+    history_res = c.execute('SELECT * FROM history WHERE id=?',(id,))
+    if history_res:
+        return json.dumps({'state':True,
+                            'id':history_res[0],
+                            'updatetime':history_res[1],
+                            'cpu':history_res[2],
+                            'mem':history_res[3],
+                            'disk':history_res[4],
+                            'net':history_res[5],
+                            })
+    else:
+        return json.dumps({'state':False})
+    conn.close()
+    return json.dumps(res)
+
 
 # 删除主机
 

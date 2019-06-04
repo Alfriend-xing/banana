@@ -252,12 +252,12 @@ $("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 3000ms; wi
       </div>
       <script>
           $('.menu .item').tab()
-          $.get('api',function(data){
-            //   $("div[data-tab='first']").text(data)
-            //   $("div[data-tab='second']").text(data)
-              $("div[data-tab='third']").text(data)
-          });
-          function serverinfo(ip) {
+          function serverinfo(id) {
+            $.get('/api/history/<'+id+'>',function(data){
+                  $("div[data-tab='first']").text(data)
+                  $("div[data-tab='second']").text(data)
+                $("div[data-tab='third']").text(data)
+            });
             $('.ui.modal').find(".header").text(ip)
             $('.ui.modal')
             .modal({
