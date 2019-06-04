@@ -212,7 +212,8 @@ $("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 3000ms; wi
     </script>
 <!-- 服务器详情页 -->
 <div class="ui modal" style="max-width: 40rem;">
-        <i class="close icon"></i>
+        
+        <i class="orange close icon" style="position: absolute; top: 1rem; right: 1rem;"></i>
         <div class="header">
           127.0.0.1
         </div>
@@ -260,7 +261,7 @@ $("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 3000ms; wi
             $('.ui.modal').find(".header").text(ip)
             $('.ui.modal')
             .modal({
-                dimmerSettings: { opacity: 0 }
+                dimmerSettings: { opacity: 0.3 }
                 }).modal('show');
           }
       </script>
