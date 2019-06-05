@@ -40,10 +40,25 @@ def client_install():
     with open('banana.conf','w',encoding='utf-8') as f:
         f.write(client_config%id)
 
-def server_install():
-    if os.path.exists('test.db'):
-        os.remove('test.db')
-    conn = sqlite3.connect('test.db')
+def find_db(db_name):
+    db='db/db'+db_name+'.db'
+    if os.path.exists(db):
+        return True
+    else:
+        return False
+
+def get_dblist():
+    path = os.getcwd()
+    dbls=os.listdir(path+'/db')
+    for i in dbls:
+        if 'journal' in i:
+            continue
+        if i.startswith('db'):
+            yield 'db/'+i
+
+def create_database(db_name):
+    db='db/db'+db_name+'.db'
+    conn = sqlite3.connect(db)
     c = conn.cursor()
     # 实时状态表
     c.execute('''CREATE TABLE realtime
@@ -68,6 +83,8 @@ def server_install():
 
     conn.commit()
     conn.close()
+
+def write_server_config():
     with open('banana.conf','w',encoding='utf-8') as f:
         f.write(server_config)
 
@@ -81,7 +98,7 @@ if __name__=='__main__':
     if install_type == 'client':
         client_install()
     elif install_type == 'server':
-        server_install()
+        write_server_config()
     else:
         print('[option error]\n client \n server ')
 

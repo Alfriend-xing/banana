@@ -4,6 +4,7 @@
 from flask import Flask,request,render_template
 import sqlite3
 import json
+from bananainstall import get_dblist
 
 app=Flask(__name__)
 
@@ -17,9 +18,10 @@ def index():
 @app.route('/api',methods=['get'])
 def api():
     res=[]
-    conn = sqlite3.connect('test.db')
-    c = conn.cursor()
-    for row in c.execute('SELECT * FROM realtime ORDER BY id'):
+    for i in get_dblist():
+        conn = sqlite3.connect(i)
+        c = conn.cursor()
+        row=c.execute('SELECT * FROM realtime WHERE id=?',(i[5:-3],)).fetchone()        
         res.append({
             'id':row[0],
             'platform':row[1],
@@ -31,11 +33,10 @@ def api():
             'label':row[7],
             'message':row[8]
         })
-    conn.close()
+        conn.close()
     return json.dumps(res)
 
 # 查询历史API
-# 查询实时数据api
 @app.route('/api/history/<id>',methods=['get'])
 def api_history(id):
     res=[]

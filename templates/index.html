@@ -193,7 +193,7 @@ function refun() {
         });
 }
 window.setInterval( refun, 1000);
-$("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 3000ms; width: 37%;");
+$("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 300ms; width: 37%;");
 });
     </script>
     <!-- <button onclick="myFunction(new Date().getTime())">Show Snackbar</button> -->
@@ -452,6 +452,10 @@ $("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 3000ms; wi
                     // $("div[data-tab='second']").text(data['mem'])
                     // $("div[data-tab='third']").text(data['disk'])
                     // $("div[data-tab='fourth']").text(data['net'])
+                    $("div[data-tab='first']").text('')
+                    $("div[data-tab='second']").text('')
+                    $("div[data-tab='third']").text('')
+                    $("div[data-tab='fourth']").text('')
                     var datetime= new Array()
                     // var time_zone=new Date().getTimezoneOffset()/60
                     for (i=0,len=data["updatetime"].length;i<len;i++) {
@@ -488,6 +492,7 @@ $("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 3000ms; wi
                     $("div[data-tab='first']").text('ERROR')
                     $("div[data-tab='second']").text('ERROR')
                     $("div[data-tab='third']").text('ERROR')
+                    $("div[data-tab='fourth']").text('ERROR')
                 }
             });
         }
