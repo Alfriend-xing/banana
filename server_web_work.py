@@ -57,8 +57,51 @@ def api_history(id):
 
 
 # 删除主机
+@app.route('/api/delete',methods=['post'])
+def api_delete():
+    data=request.form
+    id=data['id']
+    conn = sqlite3.connect('test.db')
+    c = conn.cursor()
+    res = c.execute('SELECT * FROM realtime WHERE id=?',(id,)).fetchone()
+    if res:
+        sql='DELETE FROM realtime WHERE ID =?'
+        c.execute(sql,(id,))
+        conn.commit()
+    else:
+        return json.dumps({"state":False})
+    res = c.execute('SELECT * FROM history WHERE id=?',(id,)).fetchone()
+    if res:
+        sql='DELETE FROM history WHERE ID =?'
+        c.execute(sql,(id,))
+        conn.commit()
+    else:
+        return json.dumps({"state":False})
+    conn.close()
+    return json.dumps({"state":True})
 
 # 添加 label 和 message
+@app.route('/api/msg',methods=['post'])
+def api_msg():
+    data=request.form
+    id=data['id']
+    label=data['label']
+    msg=data['message']
+    conn = sqlite3.connect('test.db')
+    c = conn.cursor()
+    res = c.execute('SELECT * FROM history WHERE id=?',(id,)).fetchone()
+    if res:
+        sql='''
+        UPDATE realtime SET 
+                    label=?,
+                    message=?
+                    WHERE id=?'''
+        c.execute(sql,(label,msg,id))
+        conn.commit()
+        conn.close()
+        return json.dumps({"state":True})
+    else:
+        return json.dumps({"state":False}),500
 
 if __name__=='__main__':
     app.run(host='127.0.0.1',port=5001)

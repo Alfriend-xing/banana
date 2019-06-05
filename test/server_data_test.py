@@ -57,7 +57,7 @@ def task_history(i):
 
 taskpool=[]
 for i in range(5):
-    # taskpool.append(pool.submit(task,i))
+    taskpool.append(pool.submit(task,i))
     taskpool.append(pool.submit(task_history,i))
     
 wait(taskpool)

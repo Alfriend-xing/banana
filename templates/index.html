@@ -132,9 +132,23 @@ function update_form(jsondata){
             
         }
         else {
-            console.log('add card')
+            // console.log('add card')
             if (timestamp-updatetime<5) {
                 myFunction({"state":true,"msg":ip+"上线"})
+            }
+            var label=jsondata[data]['label']
+            var msg=jsondata[data]['message']
+            if (label) {
+
+            } 
+            else {
+                label='test server'
+            };
+            if (msg) {
+                // console.log(msg)
+            }
+            else {
+                msg='Server description'
             }
             var t='<div class="card" id="'+id+'" onclick="serverinfo(\''+id+'\')">\
                     <div class="content">\
@@ -145,11 +159,9 @@ function update_form(jsondata){
                       <div class="header" id="ip">'+ip+'<i class="mini green circle icon" id="state_icon"></i>\
                       </div>\
                       <div class="meta">\
-                          <a class="ui teal label">dev</a>\
+                          <a class="ui teal label">'+label+'</a>\
                       </div>\
-                      <div class="description">\
-                          a place to development\
-                      </div>\
+                      <div class="description">'+msg+'</div>\
                     </div>\
                     <div class="extra content">\
                             <div class="label" id="l1">cpu</div>\
@@ -187,8 +199,10 @@ $("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 3000ms; wi
     <!-- <button onclick="myFunction(new Date().getTime())">Show Snackbar</button> -->
 
     <!-- <div id="snackbars">Some text some message..</div> -->
+
     <div id="snackbars"></div>
-    
+
+    <!-- 右下角弹窗函数 -->
     <script>
     function myFunction(data) {
         // data {'state':true,'msg':'127.0.0.1上线'}
@@ -240,15 +254,15 @@ $("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 3000ms; wi
                 <div class="ui form">
                     <div class="field">
                         <label>Label</label>
-                        <input type="text" name="first-name" placeholder="a lebel of server">
+                        <input type="text" name="first-name" placeholder="a lebel of server" id="change_label">
                     </div>
                     <div class="field">
                         <label>Server description</label>
-                        <textarea rows="2"  placeholder="server description"></textarea>
+                        <textarea rows="2"  placeholder="server description" id="change_msg"></textarea>
                     </div>
                     <div class="ui container">
-                    <button class="ui primary basic button">commit</button>
-                    <button class="ui right floated negative basic button">delete server data</button>
+                    <button onclick="submit_msg()" class="ui primary basic button" id="submit">commit</button>
+                    <button onclick="delete_server()" class="ui right floated negative basic button" >delete server data</button>
                     </div>
                 </div>
             </div></br>
@@ -256,59 +270,81 @@ $("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 3000ms; wi
       <script>
           $('.menu .item').tab()
           function serverinfo(id) {
-            var ip=$("#"+id).find("#ip").text()
-            $.getJSON('/api/history/'+id,function(data){
-                if (data['state']) {
-                    // $("div[data-tab='first']").text(data['cpu'])
-                    // $("div[data-tab='second']").text(data['mem'])
-                    // $("div[data-tab='third']").text(data['disk'])
-                    // $("div[data-tab='fourth']").text(data['net'])
-                    var datetime= new Array()
-                    // var time_zone=new Date().getTimezoneOffset()/60
-                    for (i=0,len=data["updatetime"].length;i<len;i++) {
-                        tmp_time=new Date(Number(data["updatetime"][i])*1000)
-                        datetime[i]= tmp_time.getMonth()+'-'+tmp_time.getDate()+' '+tmp_time.getHours()+':'+tmp_time.getMinutes()
-                        console.log(datetime[i])
-                    }
-                    drawchart({"id":"CPU_chart",
-                    "type":"cpu",
-                    "x":datetime,
-                    "y":data["cpu"],
-                    "title":"过去一周CPU使用情况",
-                    "label":"CPU使用率"})
-                    drawchart({"id":"MEM_chart",
-                    "type":"mem",
-                    "x":datetime,
-                    "y":data["mem"],
-                    "title":"过去一周内存使用情况",
-                    "label":"内存使用率"})
-                    drawchart({"id":"DISK_chart",
-                    "type":"disk",
-                    "x":datetime,
-                    "y":data["disk"],
-                    "title":"过去一周硬盘使用情况",
-                    "label":"硬盘使用率"})
-                    drawchart({"id":"NET_chart",
-                    "type":"net",
-                    "x":datetime,
-                    "y":data["net"],
-                    "title":"过去一周网络使用情况",
-                    "label":""})
-                }
-                else {
-                    $("div[data-tab='first']").text('ERROR')
-                    $("div[data-tab='second']").text('ERROR')
-                    $("div[data-tab='third']").text('ERROR')
-                }
-            });
-            $('.ui.modal').find(".header").text(ip)
-            $('.ui.modal')
-            .modal({
-                dimmerSettings: { opacity: 0.3 }
-                }).modal('show');
+                var ip=$("#"+id).find("#ip").text()
+                $('.ui.modal').find(".header").text(ip)
+                $('.ui.modal').find(".header").attr("id",id)
+                $('.ui.modal')
+                .modal({
+                    dimmerSettings: { opacity: 0.3 }
+                    }).modal('show');
+                drawtab(id);
           }
       </script>
       <button onclick="serverinfo('1')">Show serverinfo</button>
+
+      <!-- 修改信息函数 -->
+      <script>
+      function submit_msg() {
+          var id =$('.ui.modal').find(".header").attr("id")
+          var c_l =$("#change_label").val()
+          var c_m =$("#change_msg").val()
+          if (c_l || c_m) {
+              $("submit").attr("class","ui primary basic loading button")
+              data={
+                  "id":id,
+                  "label":c_l,
+                  "message":c_m
+              }
+              var saveData = $.ajax({
+                type: 'POST',
+                url: "/api/msg",
+                data: data,
+                dataType: "json",
+                success: function(resultData) { 
+                    myFunction({"state":true,"msg":"修改成功"});
+                    $("submit").attr("class","ui primary basic button"); },
+                error: function(a,b,c) { 
+                    myFunction({"state":false,"msg":"修改失败"}); 
+                    $("submit").attr("class","ui primary basic button");}
+            });
+            
+          }
+          else {
+            myFunction({"state":false,"msg":"内容为空"});
+          }
+          
+          var c_l =$("#change_label").val("")
+          var c_m =$("#change_msg").val("")
+        
+      }
+      </script>
+
+      <!-- 删除记录函数 -->
+      <script>
+      function delete_server() {
+          var id =$('.ui.modal').find(".header").attr("id")
+          var ip =$('.ui.modal').find(".header").text()
+          var r=confirm("将从数据库中删除\n"+ip);
+          if (r) {
+              data ={"id":id}
+            var saveData = $.ajax({
+                    type: 'POST',
+                    url: "/api/delete",
+                    data: data,
+                    dataType: "json",
+                    success: function(resultData) { 
+                        myFunction({"state":true,"msg":"删除成功"});
+                        $("#"+id).remove()},
+                    error: function(a,b,c) { 
+                        myFunction({"state":false,"msg":"删除失败"});}
+                });
+            }
+            else {
+                myFunction({"state":false,"msg":"取消"});
+            }
+          
+      }
+      </script>
 
       <!-- 画图函数 -->
       <script>
@@ -326,8 +362,8 @@ $("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 3000ms; wi
                 var upload=new Array()
                 var dwload=new Array()
                 for(j = 0,len=y.length; j < len; j++) {
-                    console.log(y)
-                    console.log(y[j])
+                    // console.log(y)
+                    // console.log(y[j])
                     if (y[j]==0) {
                     upload[j]=0
                     dwload[j]=0
@@ -369,17 +405,6 @@ $("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 3000ms; wi
                         text: title
                     },
                 }
-                
-                // options: {
-                //         scales: {
-                //             yAxes: [{
-                //                 ticks: {
-                //                     suggestedMin: 0,
-                //                     suggestedMax: 100
-                //                 }
-                //             }]
-                //         }
-                //     }
             });
             }
             else {
@@ -420,6 +445,52 @@ $("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 3000ms; wi
             }
             
             }
+        function drawtab(id) {
+            $.getJSON('/api/history/'+id,function(data){
+                if (data['state']) {
+                    // $("div[data-tab='first']").text(data['cpu'])
+                    // $("div[data-tab='second']").text(data['mem'])
+                    // $("div[data-tab='third']").text(data['disk'])
+                    // $("div[data-tab='fourth']").text(data['net'])
+                    var datetime= new Array()
+                    // var time_zone=new Date().getTimezoneOffset()/60
+                    for (i=0,len=data["updatetime"].length;i<len;i++) {
+                        tmp_time=new Date(Number(data["updatetime"][i])*1000)
+                        datetime[i]= tmp_time.getMonth()+'-'+tmp_time.getDate()+' '+tmp_time.getHours()+':'+tmp_time.getMinutes()
+                        // console.log(datetime[i])
+                    }
+                    drawchart({"id":"CPU_chart",
+                    "type":"cpu",
+                    "x":datetime,
+                    "y":data["cpu"],
+                    "title":"过去一周CPU使用情况",
+                    "label":"CPU使用率"})
+                    drawchart({"id":"MEM_chart",
+                    "type":"mem",
+                    "x":datetime,
+                    "y":data["mem"],
+                    "title":"过去一周内存使用情况",
+                    "label":"内存使用率"})
+                    drawchart({"id":"DISK_chart",
+                    "type":"disk",
+                    "x":datetime,
+                    "y":data["disk"],
+                    "title":"过去一周硬盘使用情况",
+                    "label":"硬盘使用率"})
+                    drawchart({"id":"NET_chart",
+                    "type":"net",
+                    "x":datetime,
+                    "y":data["net"],
+                    "title":"过去一周网络使用情况",
+                    "label":""})
+                }
+                else {
+                    $("div[data-tab='first']").text('ERROR')
+                    $("div[data-tab='second']").text('ERROR')
+                    $("div[data-tab='third']").text('ERROR')
+                }
+            });
+        }
       </script>
 </body>
 </html>
