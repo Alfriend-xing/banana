@@ -2,4 +2,4 @@
 *.db
 *.db-journal
 .vscode
-.__pycache__
+__pycache__
