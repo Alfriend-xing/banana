@@ -91,10 +91,11 @@ class ClientWorker(object):
         self.task_pool.append(Thread(target=self.send_api))
         self.task_pool.append(Thread(target=self.send_history_api))
         for i in self.task_pool:
+            i.setDaemon(True)
             i.start()
             time.sleep(3)
-        for i in self.task_pool:
-            i.join()
+        while True:
+            time.sleep(1)
 
     def send_api(self):
         url='http://'+self.server_ip+':'+self.server_port+'/api/'

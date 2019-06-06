@@ -5,7 +5,21 @@ import sys
 import os
 import sqlite3
 
-config=\
+server_config=\
+'''[general]
+type=server
+pidfile=banana.pid
+
+# 服务端默认配置
+[service]
+# 内存CPU报警阀值
+alarm=60
+# 数据接收端口
+data_port=5000
+# web服务端口
+web_port=5001'''
+
+client_config=\
 '''[general]
 type=client
 pidfile=banana.pid
@@ -19,22 +33,17 @@ server_ip=127.0.0.1
 # 数据发送端口
 server_port=5000
 # 发送间隔
-second=1
+second=1'''
 
-# 服务端默认配置
-[service]
-# 内存CPU报警阀值
-alarm=60
-# 数据接收端口
-data_port=5000
-# web服务端口
-web_port=5001'''
+def write_server_cfg():
+    with open('banana.conf','w',encoding='utf-8') as f:
+        f.write(server_config)
 
-
-def write_cfg():
+def write_client_cfg():
     id = str(int(round(time.time(),3)*1000))
     with open('banana.conf','w',encoding='utf-8') as f:
-        f.write(config%id)
+        f.write(client_config%id)
+
 
 def find_db(db_name):
     db='db/db'+db_name+'.db'
@@ -91,7 +100,18 @@ def create_database(db_name):
 
 
 if __name__=='__main__':
-    write_cfg()
+    if len(sys.argv) ==1:
+        print('[option]\n  server \n  client')
+        sys.exit()
+    else:
+        type=sys.argv[1]
+        if type=='server':
+            write_server_cfg()
+        elif type=='client':
+            write_client_cfg()
+        else:
+            print('[option]\n  server \n  client')
+            sys.exit()
 
 
 # todo

@@ -12,8 +12,24 @@ Monitor server running state
 可以为服务器指定标签和描述
 
 ### 安装
+```shell
+# 安装python3
+$ git clone https://github.com/Alfriend-xing/banana.git
+$ cd banana
+$ pip install -r requirements.txt
 
-### 使用
+# 服务端
+$ python bananainstall.py server
+$ vim banana.conf
+# 修改服务端IP
+server_ip=127.0.0.1 #改为服务端IP
+
+# 客户端
+$ python bananainstall.py client
+
+# 启动
+$ python banana.py
+```
 
 ### demo
 #### 上下线
