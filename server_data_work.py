@@ -42,7 +42,8 @@ def thread_sql(json_data):
             str(json_data['updatetime']),
             json_data['cpu'],
             json.dumps(json_data['mem']),
-            json.dumps(json_data['disk']),)
+            "")
+            # json.dumps(json_data['disk']))
         if find_db(id):
             conn = sqlite3.connect('db/db'+id+'.db',timeout=1)
             c = conn.cursor()
@@ -62,15 +63,17 @@ def thread_sql(json_data):
             sql='''INSERT INTO realtime VALUES (?,?,?,?,?,?,?,?,?)'''
             c.execute(sql,t1+t2+('',''))
         conn.commit()
+        conn.close()
         return 'True'
     except Exception as e:
         conn.rollback()
+        conn.close()
         print(type(e))
         print(e)
         return 'False'
     finally:
+        pass
         # lock.release()
-        conn.close()
 
 def thread_history_sql(json_data):
     # 向历史表格插入数据
@@ -78,53 +81,51 @@ def thread_history_sql(json_data):
     # 加锁不会丢数据 一条4秒；不加锁丢一半数据，一条2秒
     # print('-'*60+json_data['id']+'-'*20)
     try:
-        conn = sqlite3.connect('main.db',timeout=1)
-        c = conn.cursor()
+        id=json_data['id']
         t1 = (str(json_data['id']),)
         t2=(str(json_data['updatetime']),
             json_data['cpu'],
             json_data['mem'],
             json_data['disk'],
             json_data['net'],)
-        real_res=c.execute('SELECT * FROM history WHERE id=?', t1).fetchone()
-        if real_res:
-            tmp=[]
-            for i in range(1,6):
-                tmp.append(str(eval(real_res[i])[1:]+[t2[i-1]]))    # so bad
+        if find_db(id):
+            conn = sqlite3.connect('db/db'+id+'.db',timeout=1)
+            c = conn.cursor()
+            real_res=c.execute('SELECT * FROM history WHERE id=?', t1).fetchone()
+            if real_res:
+                tmp=[]
+                for i in range(1,6):
+                    tmp.append(str(eval(real_res[i])[1:]+[t2[i-1]]))    # so bad
 
-            sql='''UPDATE history SET 
-                    updatetime=?,
-                    cpu=?,
-                    mem=?,
-                    disk=?,
-                    net=? 
-                    WHERE id=?'''
-            c.execute(sql,tuple(tmp)+t1)
+                sql='''UPDATE history SET 
+                        updatetime=?,
+                        cpu=?,
+                        mem=?,
+                        disk=?,
+                        net=? 
+                        WHERE id=?'''
+                c.execute(sql,tuple(tmp)+t1)
+            else:
+                sql='''INSERT INTO history VALUES (?,?,?,?,?,?)'''
+                tmp=[0]*299 # 999 测试时存10条，生产环境1000
+                c.execute(sql,t1+tuple([str(tmp+[i]) for i in t2]))
+            conn.commit()
+            conn.close()
+            return 'True'
         else:
-            sql='''INSERT INTO history VALUES (?,?,?,?,?,?)'''
-            tmp=[0]*9 # 999 测试时存10条，生产环境1000
-            c.execute(sql,t1+tuple([str(tmp+[i]) for i in t2]))
-        conn.commit()
-        return 'True'
+            return 'False',500
     except IOError as e:
         conn.rollback()
+        conn.close()
         print(type(e))
         print(e)
         return 'False'
     finally:
+        pass
         # lock.release()
-        conn.close()
 
 if __name__=='__main__':
     app.run(host='127.0.0.1',port=5000)
-
-
-# todo
-# 数据库操作放入子线程中
-# 数据类型修正
-# 记录历史数据
-
-
 
 
 

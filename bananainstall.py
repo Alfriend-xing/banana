@@ -5,7 +5,7 @@ import sys
 import os
 import sqlite3
 
-client_config=\
+config=\
 '''[general]
 type=client
 pidfile=banana.pid
@@ -19,12 +19,7 @@ server_ip=127.0.0.1
 # 数据发送端口
 server_port=5000
 # 发送间隔
-second=1'''
-
-server_config=\
-'''[general]
-type=server
-pidfile=banana.pid
+second=1
 
 # 服务端默认配置
 [service]
@@ -35,14 +30,23 @@ data_port=5000
 # web服务端口
 web_port=5001'''
 
-def client_install():
+
+def write_cfg():
     id = str(int(round(time.time(),3)*1000))
     with open('banana.conf','w',encoding='utf-8') as f:
-        f.write(client_config%id)
+        f.write(config%id)
 
 def find_db(db_name):
     db='db/db'+db_name+'.db'
     if os.path.exists(db):
+        return True
+    else:
+        return False
+
+def rm_db(db_name):
+    db='db/db'+db_name+'.db'
+    if os.path.exists(db):
+        os.remove(db)
         return True
     else:
         return False
@@ -76,31 +80,18 @@ def create_database(db_name):
     c.execute('''CREATE TABLE history 
              (id TEXT primary key, 
              updatetime TEXT, 
-             cpu REAL, 
-             mem REAL, 
-             disk REAL, 
+             cpu TEXT, 
+             mem TEXT, 
+             disk TEXT, 
              net TEXT)''')
 
     conn.commit()
     conn.close()
 
-def write_server_config():
-    with open('banana.conf','w',encoding='utf-8') as f:
-        f.write(server_config)
 
 
 if __name__=='__main__':
-    if len(sys.argv)<=1:
-        print('[option error]\n client \n server ')
-        sys.exit()
-    else:
-        install_type = sys.argv[1]
-    if install_type == 'client':
-        client_install()
-    elif install_type == 'server':
-        write_server_config()
-    else:
-        print('[option error]\n client \n server ')
+    write_cfg()
 
 
 # todo

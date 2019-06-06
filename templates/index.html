@@ -280,7 +280,7 @@ $("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 300ms; wid
                 drawtab(id);
           }
       </script>
-      <button onclick="serverinfo('1')">Show serverinfo</button>
+      <!-- <button onclick="serverinfo('1')">Show serverinfo</button> -->
 
       <!-- 修改信息函数 -->
       <script>
@@ -382,15 +382,17 @@ $("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 300ms; wid
                 data: {
                     labels: x, //['January', 'February', 'March', 'April', 'May', 'June', 'July'],
                     datasets: [{
-                        label: "上传流量", //'My First dataset',
+                        label: "上传流量(MB)", //'My First dataset',
                         fill: false,
+                        radius: 0,
                         backgroundColor: 'rgb(0,181,173)',//#00b5ad
                         borderColor: 'rgb(0,181,173)',
                         data: upload, //[0, 10, 5, 2, 20, 30, 45]
                     },
                     {
-                        label:"下载流量",
+                        label:"下载流量(MB)",
                         fill: false,
+                        radius: 0,
                         backgroundColor: 'rgb(118,118,118)', //#767676
                         borderColor: 'rgb(118,118,118)',
                         data: dwload, //[0, 10, 5, 2, 20, 30, 45]
@@ -417,9 +419,10 @@ $("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 300ms; wid
                     labels: x, //['January', 'February', 'March', 'April', 'May', 'June', 'July'],
                     datasets: [{
                         label: label, //'My First dataset',
+                        radius: 0,
                         backgroundColor: 'rgba(0,181,173,0.5)',
                         borderColor: 'rgb(0,181,173)',
-                        pointBorderWidth:5,
+                        // pointBorderWidth:0,
                         borderWidth:1,
                         data: y, //[0, 10, 5, 2, 20, 30, 45]
                     }]
@@ -427,6 +430,9 @@ $("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 300ms; wid
 
                 // Configuration options go here
                 options: {
+                    tooltips:{
+                        mode:'x-axis'
+                    },
                     responsive: true,
                     title: {
                         display: true,
@@ -467,25 +473,25 @@ $("#ccc").find("#p2").find(".bar").attr("style","transition-duration: 300ms; wid
                     "type":"cpu",
                     "x":datetime,
                     "y":data["cpu"],
-                    "title":"过去一周CPU使用情况",
+                    "title":"过去24小时CPU使用情况",
                     "label":"CPU使用率"})
                     drawchart({"id":"MEM_chart",
                     "type":"mem",
                     "x":datetime,
                     "y":data["mem"],
-                    "title":"过去一周内存使用情况",
+                    "title":"过去24小时内存使用情况",
                     "label":"内存使用率"})
                     drawchart({"id":"DISK_chart",
                     "type":"disk",
                     "x":datetime,
                     "y":data["disk"],
-                    "title":"过去一周硬盘使用情况",
+                    "title":"过去24小时硬盘使用情况",
                     "label":"硬盘使用率"})
                     drawchart({"id":"NET_chart",
                     "type":"net",
                     "x":datetime,
                     "y":data["net"],
-                    "title":"过去一周网络使用情况",
+                    "title":"过去24小时网络使用情况",
                     "label":""})
                 }
                 else {

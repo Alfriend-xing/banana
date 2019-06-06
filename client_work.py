@@ -7,6 +7,7 @@ import socket
 from threading import Thread
 from configparser import ConfigParser
 import requests
+import time
 
 
 class ClientWorker(object):
@@ -20,7 +21,7 @@ class ClientWorker(object):
     def read_config(self):
         cf = ConfigParser()
         cf.read("banana.conf",encoding='utf-8')
-        self.client_id=cf['client']['client_id']
+        self.id=cf['client']['client_id']
         self.server_ip=cf['client']['server_ip']
         self.server_port=cf['client']['server_port']
         self.second=float(cf['client']['second'])
@@ -52,7 +53,7 @@ class ClientWorker(object):
         return {
             'id':self.id,
             'ip':self.ip,
-            'platform':self.sys,
+            'platform':self.sys[0], # 只发送系统名称，忽略版本
             'cpu':c,
             'mem':{'percent':m.percent,'used':int(m.used/1024**2),'total':int(m.total/1024**2)},
             # 'disk':{'percent':d,'used':int(d_used/1024**2),'total':int(d_total/1024**2)},
@@ -82,7 +83,7 @@ class ClientWorker(object):
             'cpu':c,
             'mem':m,
             'disk':d,
-            'net':str(n.bytes_sent)+'/'+str(n.bytes_recv)
+            'net':str(round(n.bytes_sent/(1024*1024),2))+'/'+str(round(n.bytes_recv/(1024*1024),2))
         }
 
     def send(self):
@@ -91,6 +92,7 @@ class ClientWorker(object):
         self.task_pool.append(Thread(target=self.send_history_api))
         for i in self.task_pool:
             i.start()
+            time.sleep(3)
         for i in self.task_pool:
             i.join()
 
@@ -111,7 +113,8 @@ class ClientWorker(object):
                 history_msg=self.get_history_msg()
                 req=requests.post(url,json=history_msg,timeout=1)
                 print(req.text)
-                time.sleep(60*10)
+                # time.sleep(60*5)
+                time.sleep(1)
             except Exception as e:
                 print(e)
 
