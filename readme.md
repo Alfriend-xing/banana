@@ -14,6 +14,8 @@ Monitor server running state
 ### 安装
 ```shell
 # 安装python3
+
+# 安装依赖
 $ git clone https://github.com/Alfriend-xing/banana.git
 $ cd banana
 $ pip install -r requirements.txt
@@ -33,13 +35,13 @@ $ python banana.py
 
 ### demo
 #### 上下线
-![](static/images/1.gif)
+![](https://cdn.sinaimg.cn.52ecy.cn/large/005BYqpgly1g3rirn2t3hg30y20hpe6g.jpg)
 #### 查看历史记录
-![](static/images/2.gif)
+![](https://cdn.sinaimg.cn.52ecy.cn/large/005BYqpgly1g3rirbvo3wg30y20hpqtl.jpg)
 #### 编辑标签
-![](static/images/3.gif)
+![](https://cdn.sinaimg.cn.52ecy.cn/large/005BYqpgly1g3riqnkyudg30y20hpx1x.jpg)
 #### 删除记录
-![](static/images/4.gif)
+![](https://cdn.sinaimg.cn.52ecy.cn/large/005BYqpgly1g3ripevtf2g30y20hpb29.jpg)
 
 ### 已找到的同类项目
 - https://github.com/k3oni/pydash
