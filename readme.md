@@ -35,13 +35,13 @@ $ python banana.py
 
 ### demo
 #### 上下线
-![](https://ws3.sinaimg.cn/large/005BYqpgly1g3rirn2t3hg30y20hpe6g.jpg)
+![](static/images/1.gif)
 #### 查看历史记录
-![](https://ws3.sinaimg.cn/large/005BYqpgly1g3rirbvo3wg30y20hpqtl.jpg)
+![](static/images/2.gif)
 #### 编辑标签
-![](https://ws3.sinaimg.cn/large/005BYqpgly1g3riqnkyudg30y20hpx1x.jpg)
+![](static/images/3.gif)
 #### 删除记录
-![](https://ws3.sinaimg.cn/large/005BYqpgly1g3ripevtf2g30y20hpb29.jpg)
+![](static/images/4.gif)
 
 ### 已找到的同类项目
 - https://github.com/k3oni/pydash
