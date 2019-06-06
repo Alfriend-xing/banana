@@ -13,7 +13,7 @@ f=0
 def task(i):
     ip='192.168.1.10'+str(i)
     # time.sleep(random.randint(1,10))
-    for _ in range(200):
+    for _ in range(8):
         data={
                 # "id":str(int(round(time.time(),3)*1000)),
                 "id":str(i),
@@ -58,6 +58,7 @@ def task_history(i):
 taskpool=[]
 for i in range(5):
     taskpool.append(pool.submit(task,i))
+    time.sleep(3)
     taskpool.append(pool.submit(task_history,i))
     
 wait(taskpool)
