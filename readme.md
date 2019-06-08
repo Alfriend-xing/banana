@@ -14,6 +14,9 @@ Monitor server running state
 ### 安装
 ```shell
 # 安装python3
+$ sudo yum install epel-release
+$ sudo yum install python34
+$ sudo yum install python34-devel
 
 # 安装依赖
 $ git clone https://github.com/Alfriend-xing/banana.git
@@ -22,12 +25,12 @@ $ pip install -r requirements.txt
 
 # 服务端
 $ python bananainstall.py server
-$ vim banana.conf
-# 修改服务端IP
-server_ip=127.0.0.1 #改为服务端IP
 
 # 客户端
 $ python bananainstall.py client
+$ vim banana.conf
+# 修改服务端IP
+server_ip=127.0.0.1 #改为服务端IP
 
 # 启动
 $ python banana.py
